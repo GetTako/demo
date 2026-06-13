@@ -18,11 +18,12 @@ func (p *TodoProvider) Boot(app *foundation.Application) error {
 	}
 	box.Init()
 
-	app.Stack().Push("base")
-
 	var overlayMgr contracts.OverlayManager
 	if err := app.Make(&overlayMgr); err == nil {
-		overlayMgr.ShowComponent(box)
+		overlayMgr.Register(box)
 	}
+
+	app.Stack().Push(box.ID())
+
 	return nil
 }

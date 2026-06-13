@@ -25,6 +25,14 @@ func (l *Layout) View(ctx *tako.Context, r *router.Router) tea.View {
 		}
 	}
 
+	// Base layer view
+	content := ctx.Hooks().Get("tako.overlay.todo-box")
+	if content != nil {
+		v := tea.NewView(content.(string))
+		v.AltScreen = true
+		return v
+	}
+
 	// Fallback empty view
 	v := tea.NewView("Tako Todo App booting...\nPress Ctrl+C to exit.")
 	v.AltScreen = true

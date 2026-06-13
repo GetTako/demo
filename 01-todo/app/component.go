@@ -2,11 +2,10 @@ package app
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
-	tea "charm.land/bubbletea/v2"
 	"charm.land/bubbles/v2/textinput"
+	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 	uv "github.com/charmbracelet/ultraviolet"
 	"github.com/gettako/tako/contracts"
@@ -62,6 +61,19 @@ func (t *TodoBox) Render() any {
 	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("42")).MarginBottom(1)
 	b.WriteString(titleStyle.Render("✓ Tako Todo List") + "\n")
 
+	// Get terminal width from storage
+	var termWidth int
+	_ = t.ctx.Storage().Get("term_width", &termWidth)
+	if termWidth <= 0 {
+		termWidth = 60 // Fallback
+	}
+
+	// Calculate responsive width with some margin
+	boxWidth := termWidth - 4
+	if boxWidth < 20 {
+		boxWidth = 20
+	}
+
 	// Render List
 	for i, todo := range t.todos {
 		itemStr := ""
@@ -71,7 +83,7 @@ func (t *TodoBox) Render() any {
 			itemStr = fmt.Sprintf("%d. [ ] %s", i+1, todo.Text)
 		}
 
-		style := lipgloss.NewStyle().Foreground(lipgloss.Color("252")).Width(58)
+		style := lipgloss.NewStyle().Foreground(lipgloss.Color("252")).Width(boxWidth)
 		if todo.Checked {
 			style = style.Strikethrough(true).Foreground(lipgloss.Color("240"))
 		}
@@ -97,6 +109,7 @@ func (t *TodoBox) Render() any {
 		t.inputModel.Blur()
 		t.inputModel.Prompt = "Input> "
 	}
+	t.inputModel.SetWidth(boxWidth - 10) // leave room for prompt
 
 	b.WriteString(t.inputModel.View())
 
@@ -209,9 +222,5 @@ func (t *TodoBox) RegisterKeys(keys contracts.KeyManager) {
 		if t.listMode && t.cursor < len(t.todos)-1 {
 			t.cursor++
 		}
-	})
-
-	z.Bind("ctrl+c", func() {
-		os.Exit(0)
 	})
 }
