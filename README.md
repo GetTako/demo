@@ -40,6 +40,7 @@ go run main.go
 - **[`10-theming/`](./10-theming/)**: Demonstrates dynamic run-time switching. Change *Color Themes* (e.g. Dark/Light) and *Languages* (i18n) on the fly without restarting the app.
 - **[`11-state/`](./11-state/)**: Showcases extreme *Reactivity*. Completely decoupled components bind to global state via `Observe().OnUpdate()`, instantly reacting to changes made elsewhere in the app.
 - **[`12-inter-plugin/`](./12-inter-plugin/)**: Demonstrates *Multi-Plugin Architecture*. Two completely independent plugins (Frontend UI and Backend Data) boot together and communicate securely across internal boundaries.
+- **[`13-native-bubbles/`](./13-native-bubbles/)**: Demonstrates *Bubble Tea Interoperability*. Shows how to use the `NativeComponent` interface to receive raw `tea.Msg` events, enabling seamless integration with the existing Charm ecosystem.
 
 ---
 
