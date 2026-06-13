@@ -73,12 +73,7 @@ func (p *CommunicationProvider) Boot(app *foundation.Application) error {
 		hook: ctx.Hooks(),
 	}
 
-	app.Stack().Push("base")
-
-	var overlayMgr contracts.OverlayManager
-	if err := app.Make(&overlayMgr); err == nil {
-		overlayMgr.ShowComponent(dashboard)
-	}
+	app.UI().MountView(dashboard)
 
 	return nil
 }

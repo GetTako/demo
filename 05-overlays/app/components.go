@@ -10,7 +10,7 @@ import (
 // ─── Base UI Component ────────────────────────────────────────────────────────
 
 type BaseComponent struct {
-	overlay contracts.OverlayManager
+	overlay contracts.UIManager
 	result  string
 }
 
@@ -52,14 +52,14 @@ func (b *BaseComponent) RegisterKeys(keys contracts.KeyManager) {
 
 	z.Bind("p", func() {
 		popup := &CustomPopup{overlay: b.overlay}
-		b.overlay.ShowComponent(popup)
+		b.overlay.MountOverlay(popup)
 	})
 }
 
 // ─── Custom Popup Component ───────────────────────────────────────────────────
 
 type CustomPopup struct {
-	overlay contracts.OverlayManager
+	overlay contracts.UIManager
 }
 
 func (c *CustomPopup) ID() string { return "custom-popup" }

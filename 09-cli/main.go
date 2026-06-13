@@ -11,7 +11,7 @@ import (
 func main() {
 	app := tako.NewApp()
 
-	// Register CLI commands. 
+	// Register CLI commands.
 	// The app doesn't have a UI adapter (No BubbleTea)!
 	// It will exclusively run as a CLI tool.
 	app.Commands(&commands.HelloCommand{})

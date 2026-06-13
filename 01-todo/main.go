@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"log"
+	"os"
 
 	"github.com/gettako/tako"
 	"github.com/gettako/tako/demo/01-todo/app"
@@ -18,7 +18,7 @@ func main() {
 	}
 
 	// Wire up the Bubble Tea rendering adapter with our Layout
-	takoApp.WithRenderer(bubbletea.NewAdapter(takoApp.Context(), &app.Layout{}))
+	takoApp.Mount(bubbletea.NewAdapter(takoApp.Context(), nil))
 
 	if err := tako.Run(takoApp, os.Args[1:]...); err != nil {
 		log.Fatalf("Application error: %v", err)

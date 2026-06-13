@@ -12,8 +12,8 @@ import (
 func main() {
 	takoApp := tako.NewApp()
 	takoApp.RegisterProviders(&app.ThemeProvider{})
-	adapter := bubbletea.NewAdapter(takoApp.Context(), &app.MainLayout{})
-	takoApp.WithRenderer(adapter)
+	adapter := bubbletea.NewAdapter(takoApp.Context(), nil)
+	takoApp.Mount(adapter)
 
 	if err := tako.Run(takoApp, os.Args[1:]...); err != nil {
 		log.Fatal(err)

@@ -21,16 +21,16 @@ func (p *BackendProvider) Boot(app *foundation.Application) error {
 	// 1. Listen for Events from other plugins
 	ctx.Events().On("frontend:ping", func(e contracts.Event) {
 		msg := e.Data.(string)
-		
+
 		// Respond back
 		response := fmt.Sprintf("Backend received: '%s'", msg)
-		ctx.Events().Publish("backend:pong", response)
+		ctx.Events().Emit("backend:pong", response)
 	})
 
 	// 2. Expose an RPC endpoint for synchronous calls
 	ctx.RPC().Route("weather:get").Handle(func(_ context.Context, req contracts.RPCRequest) (contracts.RPCResponse, error) {
 		time.Sleep(500 * time.Millisecond) // Simulate network delay
-		
+
 		location, ok := req.Payload.(string)
 		if !ok || location == "" {
 			return contracts.RPCResponse{}, fmt.Errorf("location must be a string")

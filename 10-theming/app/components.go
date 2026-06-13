@@ -17,9 +17,9 @@ func (d *Dashboard) ID() string { return "theming-dashboard" }
 func (d *Dashboard) Render() any {
 	th := d.ctx.Theme()
 	la := d.ctx.Lang()
-	
+
 	b := strings.Builder{}
-	
+
 	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(th.Get("accent")))
 	b.WriteString(titleStyle.Render("=== Theming & i18n Demo ===") + "\n\n")
 
@@ -43,7 +43,7 @@ func (d *Dashboard) Render() any {
 
 func (d *Dashboard) RegisterKeys(keys contracts.KeyManager) {
 	z := keys.Zone(d.ID())
-	
+
 	z.Bind("t", func() {
 		if d.ctx.Theme().Active() == "dark" {
 			d.ctx.Theme().Use("light")
@@ -51,7 +51,7 @@ func (d *Dashboard) RegisterKeys(keys contracts.KeyManager) {
 			d.ctx.Theme().Use("dark")
 		}
 	})
-	
+
 	z.Bind("l", func() {
 		if d.ctx.Lang().Active() == "en" {
 			d.ctx.Lang().SetLocale("id")

@@ -1,8 +1,6 @@
 package app
 
 import (
-
-	"github.com/gettako/tako/contracts"
 	"github.com/gettako/tako/pkg/foundation"
 )
 
@@ -14,14 +12,7 @@ func (p *OverlaysProvider) Register(_ *foundation.Application) error {
 }
 
 func (p *OverlaysProvider) Boot(app *foundation.Application) error {
-	app.Stack().Push("base")
-
-	var overlayMgr contracts.OverlayManager
-	if err := app.Make(&overlayMgr); err == nil {
-		base := &BaseComponent{overlay: overlayMgr}
-		overlayMgr.ShowComponent(base)
-	}
+	base := &BaseComponent{overlay: app.UI()}
+	app.UI().MountView(base)
 	return nil
 }
-
-

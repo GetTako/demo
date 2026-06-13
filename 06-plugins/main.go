@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"log"
+	"os"
 
 	"github.com/gettako/tako"
 	"github.com/gettako/tako/demo/06-plugins/app"
@@ -17,7 +17,7 @@ func main() {
 		log.Fatalf("Failed to register providers: %v", err)
 	}
 
-	takoApp.WithRenderer(bubbletea.NewAdapter(takoApp.Context(), &app.Layout{}))
+	takoApp.Mount(bubbletea.NewAdapter(takoApp.Context(), nil))
 
 	if err := tako.Run(takoApp, os.Args[1:]...); err != nil {
 		log.Fatalf("Application error: %v", err)

@@ -25,7 +25,7 @@ func (d *Dashboard) Render() any {
 	// EventBus section
 	b.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("205")).Render("1. EventBus (Async Pub/Sub)") + "\n")
 	b.WriteString("Press 'p' to emit 'frontend:ping'. Backend will reply with 'backend:pong'.\n")
-	
+
 	logs := d.log()
 	for _, l := range logs {
 		b.WriteString("> " + l + "\n")
@@ -35,7 +35,7 @@ func (d *Dashboard) Render() any {
 	// RPC section
 	b.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("220")).Render("2. RPC (Sync Request/Response)") + "\n")
 	b.WriteString("Press 'w' to call 'weather:get' endpoint from Backend.\n")
-	
+
 	if d.weatherResult != "" {
 		b.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("82")).Render("Weather: " + d.weatherResult))
 	} else {
@@ -52,21 +52,21 @@ func (d *Dashboard) Render() any {
 
 func (d *Dashboard) RegisterKeys(keys contracts.KeyManager) {
 	z := keys.Zone(d.ID())
-	
+
 	z.Bind("p", func() {
 		// Asynchronous Ping
 		d.ctx.Emit("frontend:ping", "Hello from Frontend!")
 	})
-	
+
 	z.Bind("w", func() {
 		d.weatherResult = "fetching..."
-		
+
 		// Synchronous RPC call to Backend Plugin
 		res, err := d.ctx.RPC().Call("weather:get").
 			WithPayload("Jakarta").
 			WithContext(context.Background()).
 			Await()
-			
+
 		if err != nil {
 			d.weatherResult = "Error: " + err.Error()
 		} else {

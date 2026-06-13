@@ -24,7 +24,7 @@ func (d *Dashboard) Render() any {
 	b.WriteString(fmt.Sprintf("Auto-incremented by Every(): %d\n\n", count))
 
 	b.WriteString("Press 'e' to trigger a failing background job.\n")
-	
+
 	if errStr, ok := d.ctx.State().Get("last_error").(string); ok && errStr != "" {
 		errStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("196"))
 		b.WriteString(errStyle.Render("Last Background Error: " + errStr))

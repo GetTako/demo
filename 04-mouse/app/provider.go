@@ -1,8 +1,6 @@
 package app
 
 import (
-
-	"github.com/gettako/tako/contracts"
 	"github.com/gettako/tako/pkg/foundation"
 )
 
@@ -20,13 +18,6 @@ func (p *MouseProvider) Boot(app *foundation.Application) error {
 		router: app.Router(),
 	}
 
-	app.Stack().Push("base")
-
-	var overlayMgr contracts.OverlayManager
-	if err := app.Make(&overlayMgr); err == nil {
-		overlayMgr.ShowComponent(mouseDemo)
-	}
+	app.UI().MountView(mouseDemo)
 	return nil
 }
-
-

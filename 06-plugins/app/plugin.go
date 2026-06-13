@@ -20,12 +20,7 @@ func (p *DemoPlugin) Boot(app *foundation.Application) error {
 		message: "Plugin successfully initialized and wired!",
 	}
 
-	app.Stack().Push("base")
-
-	var overlayMgr contracts.OverlayManager
-	if err := app.Make(&overlayMgr); err == nil {
-		overlayMgr.ShowComponent(component)
-	}
+	app.UI().MountView(component)
 	return nil
 }
 

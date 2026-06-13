@@ -48,7 +48,7 @@ func (c *ChatBox) Render() any {
 
 func (c *ChatBox) RegisterKeys(keys contracts.KeyManager) {
 	z := keys.Zone(c.ID())
-	
+
 	chars := "abcdefghijklmnopqrstuvwxyz0123456789-!?,. "
 	for _, ch := range chars {
 		char := string(ch)
@@ -61,7 +61,7 @@ func (c *ChatBox) RegisterKeys(keys contracts.KeyManager) {
 	})
 	z.Bind("enter", func() {
 		if strings.TrimSpace(c.input) != "" {
-			c.bus.Publish("chat:message", c.input)
+			c.bus.Emit("chat:message", c.input)
 			c.input = ""
 		}
 	})
@@ -83,7 +83,7 @@ func (r *RpcWidget) Render() any {
 	b.WriteString(titleStyle.Render("2. Calculator (RPC)") + "\n\n")
 
 	b.WriteString("Press 'c' to calculate: " + fmt.Sprintf("%d + 10", r.count) + "\n\n")
-	
+
 	if r.result != "" {
 		resStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("82"))
 		b.WriteString(resStyle.Render("Result from backend: " + r.result))
@@ -106,13 +106,13 @@ func (r *RpcWidget) RegisterKeys(keys contracts.KeyManager) {
 	z := keys.Zone(r.ID())
 	z.Bind("c", func() {
 		r.result = "calculating..."
-		
+
 		// Synchronous RPC call
 		res, err := r.rpc.Call("math:add").
 			WithPayload([]int{r.count, 10}).
 			WithContext(context.Background()).
 			Await()
-			
+
 		if err != nil {
 			r.result = "Error: " + err.Error()
 		} else {

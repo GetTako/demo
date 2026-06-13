@@ -24,20 +24,15 @@ func (p *TimeTravelProvider) Boot(app *foundation.Application) error {
 		state:   stateMgr,
 	}
 
-	stateMgr.Key("balance").Value(bankComponent.balance).Broadcast()
+	stateMgr.Mutate("balance").Value(bankComponent.balance).Broadcast()
 
-	stateMgr.Observe("balance").OnUpdate(func(oldVal, newVal any) {
+	stateMgr.Watch("balance").OnUpdate(func(oldVal, newVal any) {
 		if val, ok := newVal.(int); ok {
 			bankComponent.balance = val
 		}
 	}).Subscribe(app.Context().Context)
 
-	app.Stack().Push("base")
-
-	var overlayMgr contracts.OverlayManager
-	if err := app.Make(&overlayMgr); err == nil {
-		overlayMgr.ShowComponent(bankComponent)
-	}
+	app.UI().MountView(bankComponent)
 	return nil
 }
 
@@ -79,11 +74,11 @@ func (b *BankingComponent) RegisterKeys(keys contracts.KeyManager) {
 	z := keys.Zone(b.ID())
 
 	z.Bind("d", func() {
-		b.state.Key("balance").Value(b.balance + 100).Broadcast()
+		b.state.Mutate("balance").Value(b.balance + 100).Broadcast()
 	})
 
 	z.Bind("w", func() {
-		b.state.Key("balance").Value(b.balance - 50).Broadcast()
+		b.state.Mutate("balance").Value(b.balance - 50).Broadcast()
 	})
 
 	z.Bind("c", func() {

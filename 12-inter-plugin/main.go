@@ -20,8 +20,8 @@ func main() {
 	)
 
 	// Boot the TUI layout from frontend
-	adapter := bubbletea.NewAdapter(app.Context(), &frontend.MainLayout{})
-	app.WithRenderer(adapter)
+	adapter := bubbletea.NewAdapter(app.Context(), nil)
+	app.Mount(adapter)
 
 	if err := tako.Run(app, os.Args[1:]...); err != nil {
 		log.Fatal(err)

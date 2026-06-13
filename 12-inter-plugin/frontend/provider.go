@@ -28,11 +28,7 @@ func (p *FrontendProvider) Boot(app *foundation.Application) error {
 		log: func() []string { return p.chatLog },
 	}
 
-	app.Stack().Push("base")
-	var overlayMgr contracts.OverlayManager
-	if err := app.Make(&overlayMgr); err == nil {
-		overlayMgr.ShowComponent(dashboard)
-	}
+	app.UI().MountView(dashboard)
 
 	return nil
 }

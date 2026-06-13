@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/gettako/tako/demo/07-communication/app"
 	"github.com/gettako/tako"
+	"github.com/gettako/tako/demo/07-communication/app"
 	"github.com/gettako/tako/pkg/adapter/bubbletea"
 )
 
@@ -16,8 +16,8 @@ func main() {
 	takoApp.RegisterProviders(&app.CommunicationProvider{})
 
 	// Initialize the Bubble Tea UI adapter
-	adapter := bubbletea.NewAdapter(takoApp.Context(), &app.MainLayout{})
-	takoApp.WithRenderer(adapter)
+	adapter := bubbletea.NewAdapter(takoApp.Context(), nil)
+	takoApp.Mount(adapter)
 
 	// Run the application
 	if err := tako.Run(takoApp, os.Args[1:]...); err != nil {

@@ -9,7 +9,7 @@ import (
 	"github.com/gettako/tako/pkg/foundation"
 )
 
-type ServicesProvider struct {}
+type ServicesProvider struct{}
 
 func (p *ServicesProvider) Register(_ *foundation.Application) error { return nil }
 
@@ -32,10 +32,6 @@ func (p *ServicesProvider) Boot(app *foundation.Application) error {
 		})
 	})
 
-	app.Stack().Push("base")
-	var overlayMgr contracts.OverlayManager
-	if err := app.Make(&overlayMgr); err == nil {
-		overlayMgr.ShowComponent(&Dashboard{ctx: ctx})
-	}
+	app.UI().MountView(&Dashboard{ctx: ctx})
 	return nil
 }

@@ -11,7 +11,7 @@ import (
 
 type Dashboard struct {
 	ctx *tako.Context
-	
+
 	// A fully decoupled component that doesn't handle inputs
 	display *DisplayComponent
 }
@@ -30,7 +30,7 @@ func (d *Dashboard) Render() any {
 
 	b.WriteString("Press 'UP' to increment state.\n")
 	b.WriteString("Press 'DOWN' to decrement state.\n\n")
-	
+
 	// Render the inner component
 	b.WriteString(d.display.Render().(string))
 
@@ -57,13 +57,13 @@ func (d *Dashboard) RegisterKeys(keys contracts.KeyManager) {
 // ─── Fully Decoupled Component ────────────────────────────────────────────────
 
 type DisplayComponent struct {
-	ctx *tako.Context
+	ctx         *tako.Context
 	latestScore int
 }
 
 func (dc *DisplayComponent) Init() {
 	// Automatically reacts to state changes
-	dc.ctx.State().Observe("score").OnUpdate(func(oldVal, newVal any) {
+	dc.ctx.State().Watch("score").OnUpdate(func(oldVal, newVal any) {
 		if score, ok := newVal.(int); ok {
 			dc.latestScore = score
 		}

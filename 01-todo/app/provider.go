@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/gettako/tako/contracts"
 	"github.com/gettako/tako/pkg/foundation"
 )
 
@@ -18,12 +17,7 @@ func (p *TodoProvider) Boot(app *foundation.Application) error {
 	}
 	box.Init()
 
-	var overlayMgr contracts.OverlayManager
-	if err := app.Make(&overlayMgr); err == nil {
-		overlayMgr.Register(box)
-	}
-
-	app.Stack().Push(box.ID())
+	app.UI().MountView(box)
 
 	return nil
 }
