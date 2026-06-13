@@ -12,7 +12,7 @@ func (p *OverlaysProvider) Register(_ *foundation.Application) error {
 }
 
 func (p *OverlaysProvider) Boot(app *foundation.Application) error {
-	base := &BaseComponent{overlay: app.UI()}
+	base := &BaseComponent{ctx: app.Context(), overlay: app.UI()}
 	app.UI().MountView(base)
 	return nil
 }

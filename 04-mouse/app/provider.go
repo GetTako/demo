@@ -13,6 +13,7 @@ func (p *MouseProvider) Register(_ *foundation.Application) error {
 
 func (p *MouseProvider) Boot(app *foundation.Application) error {
 	mouseDemo := &MouseComponent{
+		ctx:    app.Context(),
 		clickX: -1,
 		clickY: -1,
 		router: app.Router(),

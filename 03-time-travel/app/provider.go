@@ -6,6 +6,7 @@ import (
 
 	"charm.land/lipgloss/v2"
 	"github.com/gettako/tako/contracts"
+	"github.com/gettako/tako/internal/tako"
 	"github.com/gettako/tako/pkg/foundation"
 )
 
@@ -20,6 +21,7 @@ func (p *TimeTravelProvider) Boot(app *foundation.Application) error {
 	stateMgr := app.Context().State()
 
 	bankComponent := &BankingComponent{
+		ctx:     app.Context(),
 		balance: 1000,
 		state:   stateMgr,
 	}
@@ -39,6 +41,7 @@ func (p *TimeTravelProvider) Boot(app *foundation.Application) error {
 // ─── UI Component ─────────────────────────────────────────────────────────────
 
 type BankingComponent struct {
+	ctx     *tako.Context
 	balance int
 	state   contracts.StateManager
 }
@@ -46,10 +49,10 @@ type BankingComponent struct {
 func (b *BankingComponent) ID() string { return "time-travel" }
 
 func (b *BankingComponent) Render() any {
-	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("212"))
-	balanceStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("82"))
+	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#C7775D"))
+	balanceStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#C7775D"))
 	if b.balance < 0 {
-		balanceStyle = balanceStyle.Foreground(lipgloss.Color("196"))
+		balanceStyle = balanceStyle.Foreground(lipgloss.Color("#C7775D"))
 	}
 
 	var sb strings.Builder
@@ -58,14 +61,27 @@ func (b *BankingComponent) Render() any {
 	sb.WriteString("Controls:\n")
 	sb.WriteString("  [d] Deposit $100\n")
 	sb.WriteString("  [w] Withdraw $50\n")
-	sb.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("196")).Render("  [c] Simulate System Crash (Panic)\n"))
+	sb.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("#C7775D")).Render("  [c] Simulate System Crash (Panic)\n"))
 	sb.WriteString("  [ctrl+c] Graceful Quit\n")
+
+	var termWidth int
+	if b.ctx != nil {
+		_ = b.ctx.Storage().Get("term_width", &termWidth)
+	}
+	if termWidth <= 0 {
+		termWidth = 80
+	}
+	containerWidth := termWidth - 8
+	if containerWidth < 40 {
+		containerWidth = 40
+	}
 
 	containerStyle := lipgloss.NewStyle().
 		Border(lipgloss.DoubleBorder()).
-		BorderForeground(lipgloss.Color("205")).
+		BorderForeground(lipgloss.Color("#C7775D")).
 		Padding(1, 4).
-		Margin(2, 4)
+		Margin(2, 4).
+		Width(containerWidth)
 
 	return containerStyle.Render(sb.String())
 }
@@ -73,7 +89,7 @@ func (b *BankingComponent) Render() any {
 func (b *BankingComponent) RegisterKeys(keys contracts.KeyManager) {
 	z := keys.Zone(b.ID())
 
-	z.Bind("d", func() {
+	z.Bind("d", func() { panic("Test crash boundary!")
 		b.state.Mutate("balance").Value(b.balance + 100).Broadcast()
 	})
 

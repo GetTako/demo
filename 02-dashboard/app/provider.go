@@ -8,6 +8,7 @@ import (
 
 	"charm.land/lipgloss/v2"
 	"github.com/gettako/tako/contracts"
+	"github.com/gettako/tako/internal/tako"
 	"github.com/gettako/tako/pkg/foundation"
 )
 
@@ -19,7 +20,7 @@ func (p *DashboardProvider) Register(_ *foundation.Application) error {
 }
 
 func (p *DashboardProvider) Boot(app *foundation.Application) error {
-	dashboard := &DashboardBox{}
+	dashboard := &DashboardBox{ctx: app.Context()}
 
 	bus := app.Events()
 	bus.Subscribe(app.Context().Context, "sys:update", func(e contracts.Event) {
@@ -61,17 +62,18 @@ func (l *MainLayout) Render() any {
 	// 1. Sidebar
 	sidebarStyle := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("63")).
-		Width(20).
+		BorderForeground(lipgloss.Color("#C7775D")).
+		Width(30).
 		Height(15).
 		Padding(1)
 
-	sidebar := sidebarStyle.Render(
-		lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("63")).Render("TAKO MENU\n\n") +
-			"1. Dashboard\n" +
-			"2. Settings\n" +
-			"3. Logout",
-	)
+	title := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#C7775D")).Render("TAKO MENU")
+	sidebarContent := title + "\n\n" +
+		"1. Dashboard\n" +
+		"2. Settings\n" +
+		"3. Logout"
+
+	sidebar := sidebarStyle.Render(sidebarContent)
 
 	// 2. Slot / View Content
 	var slotContent string
@@ -84,7 +86,10 @@ func (l *MainLayout) Render() any {
 	slotStyle := lipgloss.NewStyle().MarginLeft(2)
 
 	// 3. Combine them horizontally
-	return lipgloss.JoinHorizontal(lipgloss.Top, sidebar, slotStyle.Render(slotContent))
+	combined := lipgloss.JoinHorizontal(lipgloss.Top, sidebar, slotStyle.Render(slotContent))
+	
+	// Add margin so it aligns with other demos that have Margin(2, 4)
+	return lipgloss.NewStyle().Margin(2, 4).Render(combined)
 }
 
 func (l *MainLayout) RegisterKeys(keys contracts.KeyManager) {
@@ -96,6 +101,7 @@ func (l *MainLayout) RegisterKeys(keys contracts.KeyManager) {
 // ─── UI Component (View) ──────────────────────────────────────────────────────
 
 type DashboardBox struct {
+	ctx    *tako.Context
 	cpu    int
 	memory int
 }
@@ -103,8 +109,8 @@ type DashboardBox struct {
 func (d *DashboardBox) ID() string { return "dashboard" }
 
 func (d *DashboardBox) Render() any {
-	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("39"))
-	metricStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Bold(true)
+	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#C7775D"))
+	metricStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#C7775D")).Bold(true)
 
 	var b strings.Builder
 	b.WriteString(titleStyle.Render("=== System Metrics ===") + "\n\n")
@@ -115,11 +121,23 @@ func (d *DashboardBox) Render() any {
 	b.WriteString(fmt.Sprintf("CPU Load: [%s] %s%%\n\n", metricStyle.Render(cpuBar), metricStyle.Render(fmt.Sprint(d.cpu))))
 	b.WriteString(fmt.Sprintf("Memory  : %s MB\n", metricStyle.Render(fmt.Sprint(d.memory))))
 
+	var termWidth int
+	if d.ctx != nil {
+		_ = d.ctx.Storage().Get("term_width", &termWidth)
+	}
+	if termWidth <= 0 {
+		termWidth = 80
+	}
+	containerWidth := termWidth - 40
+	if containerWidth < 40 {
+		containerWidth = 40
+	}
+
 	containerStyle := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("39")).
+		BorderForeground(lipgloss.Color("#C7775D")).
 		Padding(1, 4).
-		Width(40).
+		Width(containerWidth).
 		Height(15)
 
 	return containerStyle.Render(b.String())

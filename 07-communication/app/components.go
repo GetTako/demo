@@ -8,11 +8,13 @@ import (
 	"charm.land/lipgloss/v2"
 	"github.com/gettako/tako/contracts"
 	"github.com/gettako/tako/internal/hook"
+	"github.com/gettako/tako/internal/tako"
 )
 
 // ─── Chat Component (Event Bus) ──────────────────────────────────────────────
 
 type ChatBox struct {
+	width int
 	bus   contracts.EventBus
 	input string
 	log   func() []string
@@ -22,25 +24,25 @@ func (c *ChatBox) ID() string { return "comm-chatbox" }
 
 func (c *ChatBox) Render() any {
 	b := strings.Builder{}
-	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("42"))
+	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#C7775D"))
 	b.WriteString(titleStyle.Render("1. Pub/Sub Chat (EventBus)") + "\n\n")
 
 	// Render log
 	logs := c.log()
-	logStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("250"))
+	logStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#C7775D"))
 	for _, l := range logs {
 		b.WriteString(logStyle.Render(l) + "\n")
 	}
 
 	b.WriteString("\n")
-	inputStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("204"))
+	inputStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#C7775D"))
 	b.WriteString(inputStyle.Render("Say: " + c.input + "_"))
 
 	box := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("63")).
+		BorderForeground(lipgloss.Color("#C7775D")).
 		Padding(1, 2).
-		Width(45).
+		Width(c.width).
 		Height(15)
 
 	return box.Render(b.String())
@@ -70,6 +72,7 @@ func (c *ChatBox) RegisterKeys(keys contracts.KeyManager) {
 // ─── RPC Component ────────────────────────────────────────────────────────────
 
 type RpcWidget struct {
+	width  int
 	rpc    contracts.RPCBus
 	count  int
 	result string
@@ -79,13 +82,13 @@ func (r *RpcWidget) ID() string { return "comm-rpc" }
 
 func (r *RpcWidget) Render() any {
 	b := strings.Builder{}
-	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("220"))
+	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#C7775D"))
 	b.WriteString(titleStyle.Render("2. Calculator (RPC)") + "\n\n")
 
 	b.WriteString("Press 'c' to calculate: " + fmt.Sprintf("%d + 10", r.count) + "\n\n")
 
 	if r.result != "" {
-		resStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("82"))
+		resStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#C7775D"))
 		b.WriteString(resStyle.Render("Result from backend: " + r.result))
 	} else {
 		b.WriteString("Waiting for request...")
@@ -93,9 +96,9 @@ func (r *RpcWidget) Render() any {
 
 	box := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("214")).
+		BorderForeground(lipgloss.Color("#C7775D")).
 		Padding(1, 2).
-		Width(45).
+		Width(r.width).
 		Height(8).
 		MarginTop(1)
 
@@ -125,6 +128,7 @@ func (r *RpcWidget) RegisterKeys(keys contracts.KeyManager) {
 // ─── Dashboard Component (Layout) ─────────────────────────────────────────────
 
 type Dashboard struct {
+	ctx  *tako.Context
 	chat *ChatBox
 	rpc  *RpcWidget
 	hook hook.Registry
@@ -133,11 +137,26 @@ type Dashboard struct {
 func (d *Dashboard) ID() string { return "comm-dashboard" }
 
 func (d *Dashboard) Render() any {
+	var termWidth int
+	if d.ctx != nil {
+		_ = d.ctx.Storage().Get("term_width", &termWidth)
+	}
+	if termWidth <= 0 {
+		termWidth = 80
+	}
+	containerWidth := termWidth - 8
+
+	leftWidth := (containerWidth * 6) / 10
+	rightWidth := containerWidth - leftWidth - 2
+
+	d.chat.width = leftWidth
+	d.rpc.width = leftWidth
+
 	chatUI := d.chat.Render().(string)
 	rpcUI := d.rpc.Render().(string)
 
 	// 3. HOOKS: Render dynamically injected side-widgets
-	hookUI := d.renderHooks()
+	hookUI := d.renderHooks(rightWidth)
 
 	leftColumn := lipgloss.JoinVertical(lipgloss.Left, chatUI, rpcUI)
 	layout := lipgloss.JoinHorizontal(lipgloss.Top, leftColumn, hookUI)
@@ -145,9 +164,9 @@ func (d *Dashboard) Render() any {
 	return lipgloss.NewStyle().Margin(1, 2).Render(layout)
 }
 
-func (d *Dashboard) renderHooks() string {
+func (d *Dashboard) renderHooks(width int) string {
 	b := strings.Builder{}
-	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("205"))
+	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#C7775D"))
 	b.WriteString(titleStyle.Render("3. Dynamic Sidebar (Hooks)") + "\n\n")
 	b.WriteString("These widgets are injected via hook slots!\n\n")
 
@@ -164,9 +183,9 @@ func (d *Dashboard) renderHooks() string {
 
 	box := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("135")).
+		BorderForeground(lipgloss.Color("#C7775D")).
 		Padding(1, 2).
-		Width(30).
+		Width(width).
 		Height(26).
 		MarginLeft(2)
 

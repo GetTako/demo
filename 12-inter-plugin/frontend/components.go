@@ -19,11 +19,11 @@ func (d *Dashboard) ID() string { return "inter-plugin-dashboard" }
 
 func (d *Dashboard) Render() any {
 	b := strings.Builder{}
-	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("42"))
+	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#C7775D"))
 	b.WriteString(titleStyle.Render("=== Inter-Plugin Communication ===") + "\n\n")
 
 	// EventBus section
-	b.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("205")).Render("1. EventBus (Async Pub/Sub)") + "\n")
+	b.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("#C7775D")).Render("1. EventBus (Async Pub/Sub)") + "\n")
 	b.WriteString("Press 'p' to emit 'frontend:ping'. Backend will reply with 'backend:pong'.\n")
 
 	logs := d.log()
@@ -33,19 +33,31 @@ func (d *Dashboard) Render() any {
 	b.WriteString("\n")
 
 	// RPC section
-	b.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("220")).Render("2. RPC (Sync Request/Response)") + "\n")
+	b.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("#C7775D")).Render("2. RPC (Sync Request/Response)") + "\n")
 	b.WriteString("Press 'w' to call 'weather:get' endpoint from Backend.\n")
 
 	if d.weatherResult != "" {
-		b.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("82")).Render("Weather: " + d.weatherResult))
+		b.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("#C7775D")).Render("Weather: " + d.weatherResult))
 	} else {
 		b.WriteString("Waiting for RPC call...")
 	}
 
+	var termWidth int
+	_ = d.ctx.Storage().Get("term_width", &termWidth)
+	if termWidth <= 0 {
+		termWidth = 80
+	}
+	containerWidth := termWidth - 8
+	if containerWidth < 40 {
+		containerWidth = 40
+	}
+
 	box := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("63")).
-		Padding(1, 2)
+		BorderForeground(lipgloss.Color("#C7775D")).
+		Padding(1, 2).
+		Margin(2, 4).
+		Width(containerWidth)
 
 	return box.Render(b.String())
 }

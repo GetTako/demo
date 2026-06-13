@@ -25,7 +25,7 @@ func (d *Dashboard) Render() any {
 	}
 
 	b := strings.Builder{}
-	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("42"))
+	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#C7775D"))
 	b.WriteString(titleStyle.Render("=== Reactive State Demo ===") + "\n\n")
 
 	b.WriteString("Press 'UP' to increment state.\n")
@@ -34,10 +34,21 @@ func (d *Dashboard) Render() any {
 	// Render the inner component
 	b.WriteString(d.display.Render().(string))
 
+	var termWidth int
+	_ = d.ctx.Storage().Get("term_width", &termWidth)
+	if termWidth <= 0 {
+		termWidth = 80
+	}
+	containerWidth := termWidth - 8
+	if containerWidth < 40 {
+		containerWidth = 40
+	}
+
 	box := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("205")).
-		Padding(1, 2)
+		BorderForeground(lipgloss.Color("#C7775D")).
+		Padding(1, 2).
+		Width(containerWidth)
 
 	return box.Render(b.String())
 }

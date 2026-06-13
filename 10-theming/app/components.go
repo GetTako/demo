@@ -31,12 +31,24 @@ func (d *Dashboard) Render() any {
 	b.WriteString("Press 't' to toggle theme.\n")
 	b.WriteString("Press 'l' to toggle language.\n")
 
+	var termWidth int
+	_ = d.ctx.Storage().Get("term_width", &termWidth)
+	if termWidth <= 0 {
+		termWidth = 80
+	}
+	containerWidth := termWidth - 8
+	if containerWidth < 40 {
+		containerWidth = 40
+	}
+
 	box := lipgloss.NewStyle().
 		Background(lipgloss.Color(th.Get("bg"))).
 		Foreground(lipgloss.Color(th.Get("fg"))).
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color(th.Get("accent"))).
-		Padding(1, 2)
+		Padding(1, 2).
+		Margin(2, 4).
+		Width(containerWidth)
 
 	return box.Render(b.String())
 }

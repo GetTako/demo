@@ -52,17 +52,18 @@ func (p *CommunicationProvider) Boot(app *foundation.Application) error {
 	// 3. HOOKS (Extensibility)
 	// We inject UI widgets into the "sidebar:widgets" hook slot.
 	ctx.Hooks().Add("sidebar:widgets", func() any {
-		style := lipgloss.NewStyle().Foreground(lipgloss.Color("42")).Border(lipgloss.NormalBorder())
+		style := lipgloss.NewStyle().Foreground(lipgloss.Color("#C7775D")).Border(lipgloss.NormalBorder())
 		return style.Render("Widget 1: System Online")
 	})
 
 	ctx.Hooks().Add("sidebar:widgets", func() any {
-		style := lipgloss.NewStyle().Foreground(lipgloss.Color("205")).Border(lipgloss.NormalBorder())
+		style := lipgloss.NewStyle().Foreground(lipgloss.Color("#C7775D")).Border(lipgloss.NormalBorder())
 		return style.Render("Widget 2: 0 Active Errors")
 	})
 
 	// Prepare dashboard component tree
 	dashboard := &Dashboard{
+		ctx: ctx,
 		chat: &ChatBox{
 			bus: ctx.Events(),
 			log: func() []string { return p.chatLog },

@@ -5,6 +5,7 @@ import (
 
 	"charm.land/lipgloss/v2"
 	"github.com/gettako/tako/contracts"
+	"github.com/gettako/tako/internal/tako"
 	"github.com/gettako/tako/pkg/foundation"
 )
 
@@ -17,6 +18,7 @@ func (p *DemoPlugin) Register(_ *foundation.Application) error {
 
 func (p *DemoPlugin) Boot(app *foundation.Application) error {
 	component := &PluginComponent{
+		ctx:     app.Context(),
 		message: "Plugin successfully initialized and wired!",
 	}
 
@@ -37,13 +39,14 @@ func (p *DemoPlugin) Manifest() foundation.PluginManifest {
 // ─── UI Component ─────────────────────────────────────────────────────────────
 
 type PluginComponent struct {
+	ctx     *tako.Context
 	message string
 }
 
 func (p *PluginComponent) ID() string { return "plugin-ui" }
 
 func (p *PluginComponent) Render() any {
-	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("87"))
+	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#C7775D"))
 
 	var b strings.Builder
 	b.WriteString(titleStyle.Render("=== Tako Plugins Demo ===") + "\n\n")
@@ -51,7 +54,19 @@ func (p *PluginComponent) Render() any {
 	b.WriteString("This demo shows how to construct a ServiceProvider\n")
 	b.WriteString("with HasManifest interface for plugin:list visibility.")
 
-	return lipgloss.NewStyle().Margin(2, 4).Border(lipgloss.DoubleBorder()).Padding(1, 2).Render(b.String())
+	var termWidth int
+	if p.ctx != nil {
+		_ = p.ctx.Storage().Get("term_width", &termWidth)
+	}
+	if termWidth <= 0 {
+		termWidth = 80
+	}
+	containerWidth := termWidth - 8
+	if containerWidth < 40 {
+		containerWidth = 40
+	}
+
+	return lipgloss.NewStyle().Margin(2, 4).Border(lipgloss.DoubleBorder()).Padding(1, 2).Width(containerWidth).Render(b.String())
 }
 
 func (p *PluginComponent) RegisterKeys(keys contracts.KeyManager) {

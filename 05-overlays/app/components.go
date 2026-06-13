@@ -5,11 +5,13 @@ import (
 
 	"charm.land/lipgloss/v2"
 	"github.com/gettako/tako/contracts"
+	"github.com/gettako/tako/internal/tako"
 )
 
 // ─── Base UI Component ────────────────────────────────────────────────────────
 
 type BaseComponent struct {
+	ctx     *tako.Context
 	overlay contracts.UIManager
 	result  string
 }
@@ -17,7 +19,7 @@ type BaseComponent struct {
 func (b *BaseComponent) ID() string { return "overlays-base" }
 
 func (b *BaseComponent) Render() any {
-	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("205"))
+	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#C7775D"))
 
 	var sb strings.Builder
 	sb.WriteString(titleStyle.Render("=== Tako Overlays Demo ===") + "\n\n")
@@ -25,14 +27,27 @@ func (b *BaseComponent) Render() any {
 	sb.WriteString("Press 'p' to open a custom Modal Popup\n\n")
 
 	if b.result != "" {
-		sb.WriteString("Last Action: " + lipgloss.NewStyle().Foreground(lipgloss.Color("10")).Render(b.result) + "\n")
+		sb.WriteString("Last Action: " + lipgloss.NewStyle().Foreground(lipgloss.Color("#C7775D")).Render(b.result) + "\n")
+	}
+
+	var termWidth int
+	if b.ctx != nil {
+		_ = b.ctx.Storage().Get("term_width", &termWidth)
+	}
+	if termWidth <= 0 {
+		termWidth = 80
+	}
+	containerWidth := termWidth - 8
+	if containerWidth < 40 {
+		containerWidth = 40
 	}
 
 	containerStyle := lipgloss.NewStyle().
 		Border(lipgloss.DoubleBorder()).
-		BorderForeground(lipgloss.Color("205")).
+		BorderForeground(lipgloss.Color("#C7775D")).
 		Padding(1, 4).
-		Margin(2, 4)
+		Margin(2, 4).
+		Width(containerWidth)
 
 	return containerStyle.Render(sb.String())
 }
@@ -65,12 +80,12 @@ type CustomPopup struct {
 func (c *CustomPopup) ID() string { return "custom-popup" }
 
 func (c *CustomPopup) Render() any {
-	text := lipgloss.NewStyle().Foreground(lipgloss.Color("15")).Render("This is a custom popup overlay!\nNotice how it captures keyboard focus.\n\nPress 'esc' to close.")
+	text := lipgloss.NewStyle().Foreground(lipgloss.Color("#FFFFFF")).Render("This is a custom popup overlay!\nNotice how it captures keyboard focus.\n\nPress 'esc' to close.")
 
 	box := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("82")).
-		Background(lipgloss.Color("236")).
+		BorderForeground(lipgloss.Color("#C7775D")).
+		Background(lipgloss.Color("#C7775D")).
 		Padding(2, 4).
 		Render(text)
 
