@@ -80,6 +80,6 @@ func (c *CustomPopup) Render() any {
 func (c *CustomPopup) RegisterKeys(keys contracts.KeyManager) {
 	z := keys.Zone(c.ID())
 	z.Bind("esc", func() {
-		c.overlay.Close()
+		c.overlay.Unmount()
 	})
 }
