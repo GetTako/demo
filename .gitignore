@@ -1,0 +1,16 @@
+# Binaries
+01-todo/01-todo
+02-dashboard/02-dashboard
+03-time-travel/03-time-travel
+04-mouse/04-mouse
+05-overlays/05-overlays
+06-plugins/06-plugins
+07-communication/07-communication
+08-forms/08-forms
+09-cli/09-cli
+
+# Tako data
+.tako/
+
+# OS specific
+.DS_Store
